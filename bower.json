@@ -1,0 +1,15 @@
+{
+  "name": "bedrock-angular-paging",
+  "version": "0.0.1",
+  "moduleType": ["amd"],
+  "main": "./paging.js",
+  "ignore": [
+    "bower_components"
+  ],
+  "dependencies": {
+    "bedrock-angular": "^1.0.0"
+  },
+  "resolutions": {
+    "angular": ">=1.3.0"
+  }
+}
