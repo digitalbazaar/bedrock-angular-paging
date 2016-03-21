@@ -39,6 +39,7 @@ function factory($window) {
 
     $attrs.$observe('brResourceAmount', function() {
       console.log("Resource amount changed to", scope.brResourceAmount);
+      bottomElement = document.getElementById('infinite-scroll-bottom');
       triggerPageLoad();
     });
 
@@ -93,8 +94,11 @@ function factory($window) {
             bindScrollHandler();
             scope.$apply();
             if(isVisible(bottomElement)) {
+              console.log("Still visible space, triggering again");
               // There is still visible space, trigger refresh again
               triggerPageLoad();
+            } else {
+              console.log("No visible space");
             }
           }
         });
