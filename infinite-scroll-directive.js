@@ -11,7 +11,7 @@ function factory($window) {
     restrict: 'E',
     transclude: true,
     scope: {
-      brResourceAmount: '@',
+      brTotalAmount: '=',
       brLimitAmount: '=',
       brViewportSelector: '@',
       brPagingFunction: '&'
@@ -27,19 +27,15 @@ function factory($window) {
     model.pagingFunction = scope.brPagingFunction;
     model.limitAmount = scope.brLimitAmount;
     model.viewportSelector = scope.brViewportSelector;
-    model.resourceAmount = scope.brResourceAmount;
+    model.totalAmount = scope.brTotalAmount;
     model.offset = 0;
     model.currentAmount = model.limitAmount;
 
     var bottomElement = document.getElementById('infinite-scroll-bottom');
 
-    console.log('limit amount', model.limitAmount);
-    console.log('viewport selector', model.viewportSelector);
-    console.log('Resource amount', scope.brResourceAmount);
-
-    $attrs.$observe('brResourceAmount', function() {
-      console.log("Resource amount changed to", scope.brResourceAmount);
+    scope.$watch('brTotalAmount', function() {
       bottomElement = document.getElementById('infinite-scroll-bottom');
+      model.currentAmount = model.limitAmount;
       triggerPageLoad();
     });
 
@@ -48,8 +44,6 @@ function factory($window) {
     }
     var innerScope = scope.$new();
     $transclude(scope.$parent, function(clone) {
-      console.log("clone", clone);
-      console.log("innerScope", innerScope);
       $element.prepend(clone);
       $element.on('$destroy', function() {
         innerScope.$destroy();
@@ -57,7 +51,6 @@ function factory($window) {
     });
 
     bindScrollHandler();
-
     triggerPageLoad();
 
     function bindScrollHandler() {
@@ -68,24 +61,37 @@ function factory($window) {
           viewport = viewportElem;
         }
       }
-      viewport.bind('scroll', function() {
-        if(isVisible(bottomElement) && model.loading === false) {
-          triggerPageLoad();
-          scope.$apply();
+      viewport.bind('scroll', scrollHandler);
+    }
+    function unbindScrollHandler() {
+      var viewport = angular.element($window);
+      if(model.viewportSelector) {
+        var viewportElem = angular.element(model.viewportSelector);
+        if(hasScrollbar(viewportElem)) {
+          viewport = viewportElem;
         }
-      });
+      }
+      viewport.unbind('scroll', scrollHandler);
+    }
+    function scrollHandler() {
+      if(isVisible(bottomElement) && model.loading === false) {
+        triggerPageLoad();
+        scope.$apply();
+      }
     }
 
     function triggerPageLoad() {
-      //console.log("Trigger page load");
-      if(model.currentAmount >
-        parseInt(scope.brResourceAmount) + parseInt(model.limitAmount)) {
+      var ceiling = parseInt(scope.brTotalAmount) + model.limitAmount;
+      if(ceiling == NaN) {
+        // Some error occured, just default to the limit amount
+        ceiling = model.limitAmount;
+      }
+      if(model.currentAmount > ceiling) {
+        unbindScrollHandler();
         // No more resources, don't trigger refresh
-        //console.log("Not triggering page load, current resource count", model.currentAmount);
         return;
       }
       model.loading = true;
-      //console.log('Trigger refresh with amount', model.currentAmount);
       model.pagingFunction(
         {
           limit: model.currentAmount,
@@ -95,12 +101,10 @@ function factory($window) {
             model.loading = false;
             bindScrollHandler();
             if(isVisible(bottomElement)) {
-              console.log("Still visible space, triggering again");
               // There is still visible space, trigger refresh again
               triggerPageLoad();
-            } else {
-              console.log("No visible space");
             }
+            scope.$apply();
           }
         });
     }
