@@ -77,13 +77,15 @@ function factory($window) {
     }
 
     function triggerPageLoad() {
-      if(model.currentAmount > scope.brResourceAmount) {
+      //console.log("Trigger page load");
+      if(model.currentAmount >
+        parseInt(scope.brResourceAmount) + parseInt(model.limitAmount)) {
         // No more resources, don't trigger refresh
-        console.log("Not triggering page load, current resource count", model.currentAmount);
+        //console.log("Not triggering page load, current resource count", model.currentAmount);
         return;
       }
       model.loading = true;
-      console.log('Trigger refresh with amount', model.currentAmount);
+      //console.log('Trigger refresh with amount', model.currentAmount);
       model.pagingFunction(
         {
           limit: model.currentAmount,
@@ -92,7 +94,6 @@ function factory($window) {
             model.currentAmount = model.currentAmount + model.limitAmount;
             model.loading = false;
             bindScrollHandler();
-            scope.$apply();
             if(isVisible(bottomElement)) {
               console.log("Still visible space, triggering again");
               // There is still visible space, trigger refresh again
