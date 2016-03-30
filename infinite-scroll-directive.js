@@ -14,7 +14,8 @@ function factory($window) {
       brTotalAmount: '=',
       brLimitAmount: '=',
       brViewportSelector: '@',
-      brPagingFunction: '&'
+      brPagingFunction: '&',
+      brLoading: '=?'
     },
     templateUrl: requirejs.toUrl(
       'bedrock-angular-paging/infinite-scroll.html'),
