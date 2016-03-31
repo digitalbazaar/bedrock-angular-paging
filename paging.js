@@ -4,7 +4,7 @@
 define([
   'angular',
   './infinite-scroll-directive',
-  './paging-directive',
+  './paging-directive'
 ], function(
   angular,
   infiniteScrollDirective,
