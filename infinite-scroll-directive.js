@@ -83,7 +83,7 @@ function factory($window) {
 
     function triggerPageLoad() {
       var ceiling = parseInt(scope.brTotalAmount) + model.limitAmount;
-      if(ceiling == NaN) {
+      if(isNaN(ceiling)) {
         // Some error occured, just default to the limit amount
         ceiling = model.limitAmount;
       }
@@ -110,13 +110,15 @@ function factory($window) {
         });
     }
     function isVisible(elem) {
-      var top = elem.getBoundingClientRect().top, rect, elem = elem.parentNode;
+      var top = elem.getBoundingClientRect().top;
+      var rect;
+      elem = elem.parentNode;
       do {
-        if(elem == null) {
+        if(elem === null) {
           return false;
         }
         rect = elem.getBoundingClientRect();
-        if(top <= rect.bottom === false) {
+        if(top >= rect.bottom) {
           return false;
         }
         elem = elem.parentNode;
