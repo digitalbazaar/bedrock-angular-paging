@@ -20,19 +20,22 @@ function register(module) {
 }
 
 /* @ngInject */
-function Ctrl($element, $scope, $window) {
+function Ctrl($element, $scope, $timeout, $window) {
   var self = this;
   self.loading = false;
 
   var viewport;
   var bottom = getBottom($element);
 
+  // watch for scrollability changes
   $scope.$watch(function() {
     return self.canScroll;
   }, function(canScroll) {
     if(canScroll) {
+      // handle scroll changes
       bindScrollHandler();
-      triggerPageLoad();
+      // schedule a check to see if another page load is needed after digest
+      $timeout(loadPageAsNeeded);
     } else {
       unbindScrollHandler();
     }
@@ -55,18 +58,18 @@ function Ctrl($element, $scope, $window) {
         viewport = customViewport;
       }
     }
-    viewport.bind('scroll', scrollHandler);
+    viewport.bind('scroll', loadPageAsNeeded);
   }
 
   function unbindScrollHandler() {
     if(viewport) {
-      viewport.unbind('scroll', scrollHandler);
+      viewport.unbind('scroll', loadPageAsNeeded);
       viewport = null;
     }
   }
 
-  function scrollHandler() {
-    if(isVisible(bottom) && !self.loading) {
+  function loadPageAsNeeded() {
+    if(!self.loading && isVisible(bottom)) {
       triggerPageLoad();
     }
   }
@@ -80,10 +83,8 @@ function Ctrl($element, $scope, $window) {
     Promise.resolve(self.onLoadPage()).catch(function() {}).then(function() {
       self.loading = false;
       $scope.$apply();
-      if(isVisible(bottom)) {
-        // there is still visible space, trigger refresh again
-        triggerPageLoad();
-      }
+      // another page may be required
+      loadPageAsNeeded();
     });
   }
 
@@ -108,10 +109,10 @@ function Ctrl($element, $scope, $window) {
   function hasScrollbar(elem) {
     return elem[0].scrollHeight > elem.height();
   }
-}
 
-function getBottom($element) {
-  return $element[0].querySelector('.br-infinite-scroller-bottom');
+  function getBottom() {
+    return $element[0].querySelector('.br-infinite-scroller-bottom');
+  }
 }
 
 return register;
