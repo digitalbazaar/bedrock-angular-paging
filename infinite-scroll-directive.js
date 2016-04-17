@@ -14,7 +14,7 @@ function factory($window) {
       brTotalAmount: '=',
       brLimitAmount: '=',
       brViewportSelector: '@',
-      brPagingFunction: '&',
+      brOnLoadPage: '&',
       brLoading: '=?'
     },
     templateUrl: requirejs.toUrl(
@@ -25,7 +25,7 @@ function factory($window) {
   function Link(scope, $element, $attrs, controller, $transclude) {
     var model = scope.model = {};
     model.loading = false;
-    model.pagingFunction = scope.brPagingFunction;
+    model.onLoadPage = scope.brOnLoadPage;
     model.limitAmount = scope.brLimitAmount;
     model.viewportSelector = scope.brViewportSelector;
     model.totalAmount = scope.brTotalAmount;
@@ -93,21 +93,19 @@ function factory($window) {
         return;
       }
       model.loading = true;
-      model.pagingFunction(
-        {
-          limit: model.currentAmount,
-          offset: model.offset,
-          done: function() {
-            model.currentAmount = model.currentAmount + model.limitAmount;
-            model.loading = false;
-            bindScrollHandler();
-            if(isVisible(bottomElement)) {
-              // There is still visible space, trigger refresh again
-              triggerPageLoad();
-            }
-            scope.$apply();
-          }
-        });
+      Promise.resolve(model.onLoadPage({
+        limit: model.currentAmount,
+        offset: model.offset
+      })).catch(function() {}).then(function() {
+        model.currentAmount = model.currentAmount + model.limitAmount;
+        model.loading = false;
+        bindScrollHandler();
+        if(isVisible(bottomElement)) {
+          // There is still visible space, trigger refresh again
+          triggerPageLoad();
+        }
+        scope.$apply();
+      });
     }
     function isVisible(elem) {
       var top = elem.getBoundingClientRect().top;
