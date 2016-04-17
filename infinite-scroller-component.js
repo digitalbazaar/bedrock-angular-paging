@@ -8,7 +8,7 @@ define(['angular'], function(angular) {
 function register(module) {
   module.component('brInfiniteScroller', {
     bindings: {
-      max: '<brScrollMax',
+      canScroll: '<brCanScroll',
       viewportSelector: '@?brScrollViewport',
       onLoadPage: '&brOnLoadPage'
     },
@@ -22,32 +22,26 @@ function register(module) {
 /* @ngInject */
 function Ctrl($element, $scope, $window) {
   var self = this;
-
   self.loading = false;
-  self.offset = 0;
 
   var viewport;
   var bottom = getBottom($element);
 
   $scope.$watch(function() {
-    return self.max;
-  }, function() {
-    if(self.max > self.offset) {
-      self.offset = self.max;
+    return self.canScroll;
+  }, function(canScroll) {
+    if(canScroll) {
+      bindScrollHandler();
+      triggerPageLoad();
+    } else {
+      unbindScrollHandler();
     }
-    bindScrollHandler();
-    triggerPageLoad();
   });
 
   // cleanup scroll handler when component is destroyed
   self.$onDestroy = function() {
     unbindScrollHandler();
     viewport = bottom = null;
-  };
-
-  // reset the scroller
-  self.clear = function() {
-    self.offset = 0;
   };
 
   function bindScrollHandler() {
@@ -65,8 +59,10 @@ function Ctrl($element, $scope, $window) {
   }
 
   function unbindScrollHandler() {
-    viewport.unbind('scroll', scrollHandler);
-    viewport = null;
+    if(viewport) {
+      viewport.unbind('scroll', scrollHandler);
+      viewport = null;
+    }
   }
 
   function scrollHandler() {
@@ -76,16 +72,12 @@ function Ctrl($element, $scope, $window) {
   }
 
   function triggerPageLoad() {
-    if(self.offset >= self.max) {
-      unbindScrollHandler();
+    if(!self.canScroll) {
       // no more items, don't trigger refresh
       return;
     }
     self.loading = true;
-    Promise.resolve(self.onLoadPage({
-      offset: self.offset
-    })).catch(function() {}).then(function(count) {
-      self.offset += (count || 0);
+    Promise.resolve(self.onLoadPage()).catch(function() {}).then(function() {
       self.loading = false;
       $scope.$apply();
       if(isVisible(bottom)) {
