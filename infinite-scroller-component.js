@@ -72,7 +72,7 @@ function Ctrl($element, $scope, $timeout, $window) {
   }
 
   function loadPageAsNeeded() {
-    if(!self.loading && isVisible(bottom)) {
+    if(!self.loading && !belowViewport(bottom)) {
       triggerPageLoad();
     }
   }
@@ -91,22 +91,26 @@ function Ctrl($element, $scope, $timeout, $window) {
     });
   }
 
-  function isVisible(elem) {
-    var top = elem.getBoundingClientRect().top;
-    var rect;
-    elem = elem.parentNode;
-    do {
-      if(elem === null) {
+  function belowViewport(el) {
+    // must traverse DOM to account for additional scrolling viewports
+    var rect = el.getBoundingClientRect();
+    var top = rect.top;
+    var bottom = rect.bottom;
+    el = el.parentNode;
+    while(el && el !== document.body) {
+      rect = el.getBoundingClientRect();
+      // if element top is below parent's rectangle
+      if(top > rect.bottom) {
+        return true;
+      }
+      // if element bottom is above parent's rectangle
+      // (e.g. scrolled up out of view)
+      if(bottom <= rect.top) {
         return false;
       }
-      rect = elem.getBoundingClientRect();
-      if(top >= rect.bottom) {
-        return false;
-      }
-      elem = elem.parentNode;
-    } while(elem != document.body);
-    // check its within the document viewport
-    return top <= document.documentElement.clientHeight;
+      el = el.parentNode;
+    }
+    return top > document.documentElement.clientHeight;
   }
 
   function hasScrollbar(elem) {
