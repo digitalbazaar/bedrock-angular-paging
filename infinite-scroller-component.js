@@ -87,7 +87,7 @@ function Ctrl($element, $scope, $timeout, $window) {
       self.loading = false;
       $scope.$apply();
       // another page may be required
-      loadPageAsNeeded();
+      $timeout(loadPageAsNeeded);
     });
   }
 
