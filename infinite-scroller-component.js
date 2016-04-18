@@ -9,6 +9,8 @@ function register(module) {
   module.component('brInfiniteScroller', {
     bindings: {
       canScroll: '<brCanScroll',
+      // TODO: replace "canScroll" with pages remaining, deprecate brCanScroll
+      pagesRemaining: '<?brPagesRemaining',
       viewportSelector: '@?brScrollViewport',
       onLoadPage: '&brOnLoadPage'
     },
