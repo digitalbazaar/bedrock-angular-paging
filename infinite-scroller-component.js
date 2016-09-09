@@ -10,8 +10,8 @@ function register(module) {
     bindings: {
       canScroll: '<brCanScroll',
       // TODO: replace "canScroll" with one of these?, deprecate brCanScroll
-      //pagesRemaining: '<?brPagesRemaining',
-      //hasMore: '<?brHasMorePages',
+      // pagesRemaining: '<?brPagesRemaining',
+      // hasMore: '<?brHasMorePages',
       viewportSelector: '@?brScrollViewport',
       onLoadPage: '&brOnLoadPage'
     },
@@ -29,6 +29,14 @@ function Ctrl($element, $scope, $timeout, $window) {
 
   var viewport;
   var bottom = getBottom($element);
+
+  // FIXME: use MutationObserver on bottom element position instead of $watch
+  // on text in element
+  $scope.$watch(function() {
+    return $element.text().length;
+  }, function() {
+    loadPageAsNeeded();
+  });
 
   // watch for scrollability changes
   $scope.$watch(function() {
