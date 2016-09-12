@@ -1,7 +1,9 @@
 {
   "name": "bedrock-angular-paging",
-  "version": "1.0.2-dev",
-  "moduleType": ["amd"],
+  "version": "1.0.2",
+  "moduleType": [
+    "amd"
+  ],
   "main": "./main.js",
   "ignore": [
     "bower_components"
