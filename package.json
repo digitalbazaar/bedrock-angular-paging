@@ -1,0 +1,20 @@
+{
+  "name": "bedrock-angular-paging",
+  "version": "1.0.0",
+  "description": "Front end directives to support the displaying of paged content.",
+  "main": "index.js",
+  "dependencies": {
+    "angular": "~1.6.4"
+  },
+  "bedrock": {
+    "browserDependencies": "all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digitalbazaar/bedrock-angular-paging.git"
+  },
+  "bugs": {
+    "url": "https://github.com/digitalbazaar/bedrock-angular-paging/issues"
+  },
+  "homepage": "https://github.com/digitalbazaar/bedrock-angular-paging#readme"
+}

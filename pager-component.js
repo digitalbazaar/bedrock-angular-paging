@@ -1,23 +1,11 @@
 /*!
- * Copyright (c) 2016 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2016-2017 Digital Bazaar, Inc. All rights reserved.
  */
-define([], function() {
-
-'use strict';
-
-function register(module) {
-  module.component('brPaging', {
-    bindings: {},
-    controller: Ctrl,
-    templateUrl:
-      requirejs.toUrl('bedrock-angular-paging/pager-component.html')
-  });
-}
+export default {
+  bindings: {},
+  controller: Ctrl,
+  templateUrl: 'bedrock-angular-paging/pager-component.html'
+};
 
 /* @ngInject */
-function Ctrl() {
-}
-
-return register;
-
-});
+function Ctrl() {}

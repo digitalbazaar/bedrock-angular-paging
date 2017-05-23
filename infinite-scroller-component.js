@@ -1,26 +1,22 @@
 /*!
- * Copyright (c) 2016 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2016-2017 Digital Bazaar, Inc. All rights reserved.
  */
-define(['angular'], function(angular) {
+/* global document */
+import angular from 'angular';
 
-'use strict';
-
-function register(module) {
-  module.component('brInfiniteScroller', {
-    bindings: {
-      canScroll: '<brCanScroll',
-      // TODO: replace "canScroll" with one of these?, deprecate brCanScroll
-      // pagesRemaining: '<?brPagesRemaining',
-      // hasMore: '<?brHasMorePages',
-      viewportSelector: '@?brScrollViewport',
-      onLoadPage: '&brOnLoadPage'
-    },
-    transclude: true,
-    controller: Ctrl,
-    templateUrl:
-      requirejs.toUrl('bedrock-angular-paging/infinite-scroller-component.html')
-  });
-}
+export default {
+  bindings: {
+    canScroll: '<brCanScroll',
+    // TODO: replace "canScroll" with one of these?, deprecate brCanScroll
+    // pagesRemaining: '<?brPagesRemaining',
+    // hasMore: '<?brHasMorePages',
+    viewportSelector: '@?brScrollViewport',
+    onLoadPage: '&brOnLoadPage'
+  },
+  transclude: true,
+  controller: Ctrl,
+  templateUrl: 'bedrock-angular-paging/infinite-scroller-component.html'
+};
 
 /* @ngInject */
 function Ctrl($element, $scope, $timeout, $window) {
@@ -129,7 +125,3 @@ function Ctrl($element, $scope, $timeout, $window) {
     return $element[0].querySelector('.br-infinite-scroller-bottom');
   }
 }
-
-return register;
-
-});
